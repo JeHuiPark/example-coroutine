@@ -43,13 +43,13 @@ suspend fun main() {
         printDone()
     }
 
-    val channel = createChannelUsingProduce()
+    val channel = createChannelUsingProduce(channelNameSuffix = "1")
     for (i in channel) {
         println(i)
     }
     printDone()
 
-    with(createChannelUsingProduce()) {
+    with(createChannelUsingProduce(channelNameSuffix = "2")) {
         // fan-out model
         val coroutineScope = CoroutineScope(Dispatchers.Default)
         val flow = receiveAsFlow()
@@ -67,7 +67,7 @@ suspend fun main() {
         printDone()
     }
 
-    with(createChannelUsingProduce()) {
+    with(createChannelUsingProduce(channelNameSuffix = "3")) {
         val flow = consumeAsFlow()
             .take(1)
             .onEach { println("$it at consumeAsFlow-test-collector") }
@@ -81,14 +81,13 @@ suspend fun main() {
     }
 }
 
-private var channelIndex = 0
-private suspend fun createChannelUsingProduce(): ReceiveChannel<Int> {
+private suspend fun createChannelUsingProduce(channelNameSuffix: String): ReceiveChannel<Int> {
     // no buffered
     val channel = CoroutineScope(Dispatchers.Default).produce {
         for (i in 0 until 5) {
             send(i)
         }
     }
-    println("created channel-${channelIndex++}")
+    println("created channel-$channelNameSuffix")
     return channel
 }
