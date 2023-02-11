@@ -1,9 +1,17 @@
 plugins {
-    kotlin("jvm") version "1.6.21"
+    kotlin("jvm") version "1.8.10"
 }
 
 repositories {
     mavenCentral()
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    with(kotlinOptions) {
+        freeCompilerArgs += "-Xcontext-receivers"
+        freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        jvmTarget = "17"
+    }
 }
 
 dependencies {
