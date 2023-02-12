@@ -1,6 +1,7 @@
 package example.coroutines
 
 import example.printDone
+import example.shouldBe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -39,7 +40,7 @@ suspend fun main() {
 //        sent value 3
 //        before send value 4
 //        sent value 4
-        assert(receiveChannel.receive() == 5)
+        receiveChannel.receive() shouldBe 4
         printDone()
     }
 
