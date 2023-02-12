@@ -4,6 +4,7 @@ import example.printDone
 import example.shouldBe
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.asContextElement
+import kotlinx.coroutines.ensurePresent
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
@@ -12,28 +13,34 @@ suspend fun main() {
         val threadLocal = ThreadLocal<String>()
         threadLocal.set("value-1")
         val job = GlobalScope.launch(threadLocal.asContextElement("example")) {
-            threadLocal.get() shouldBe "example"
+            threadLocal.getSafely() shouldBe "example"
 
             threadLocal.set("local-value")
-            threadLocal.get() shouldBe "local-value"
+            threadLocal.getSafely() shouldBe "local-value"
 
             (0 until 10).map {
                 launch {
-                    threadLocal.get() shouldBe "example"
+                    threadLocal.ensurePresent()
+                    threadLocal.getSafely() shouldBe "example"
 
                     val localVar = (0..100).random()
                     threadLocal.set("value-$localVar")
-                    threadLocal.get() shouldBe "value-$localVar"
+                    threadLocal.getSafely() shouldBe "value-$localVar"
                 }
             }.joinAll()
 
             // 로컬에서 값을 변경할 경우 부작용이 발생할 수 있다
             // returns 'local-value' or 'example'
-            // threadLocal.get() shouldBe "example"
+            // threadLocal.getSafely() shouldBe "example"
         }
         threadLocal.get() shouldBe "value-1"
         job.join()
     }
 
     printDone()
+}
+
+private suspend inline fun <T> ThreadLocal<T>.getSafely(): T {
+    ensurePresent()
+    return get()
 }
