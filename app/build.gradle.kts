@@ -10,6 +10,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     with(kotlinOptions) {
         freeCompilerArgs += "-Xcontext-receivers"
         freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.DelicateCoroutinesApi"
         jvmTarget = "17"
     }
 }
